@@ -7,7 +7,7 @@ from catalog.database_setup import Base
 
 def connect_database():
     """Connects to database and returns session object."""
-    engine = create_engine(app.config['DATABASE_URL'])
+    engine = create_engine(app.config['sqlite:///coffeeshopmenu.db'])
     Base.metadata.bind = engine
     db_session = sessionmaker(bind=engine)
     session = db_session()
