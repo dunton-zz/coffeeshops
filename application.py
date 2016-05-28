@@ -2,7 +2,7 @@ import os.path
 
 from catalog import app
 from catalog.database_setup import create_db
-from catalog.populate_database import populate_database
+from catalog.populate_database import database_populator
 
 if __name__ == '__main__':
     # App configuration
