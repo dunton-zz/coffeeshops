@@ -24,11 +24,11 @@ import os
 
 app = Flask(__name__)
 
-engine = create_engine('sqlite:///coffeeShopmenu.db')
-Base.metadata.bind = engine
+#engine = create_engine('sqlite:///coffeeShopmenu.db')
+#Base.metadata.bind = engine
 
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+#DBSession = sessionmaker(bind=engine)
+#session = DBSession()
 
 
 @app.route('/login')
