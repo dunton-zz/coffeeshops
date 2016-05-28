@@ -1,46 +1,72 @@
-import os
-
-import sys
+# Set up the database #
 
 from sqlalchemy import Column, ForeignKey, Integer, String
-
 from sqlalchemy.ext.declarative import declarative_base
-
 from sqlalchemy.orm import relationship
-
 from sqlalchemy import create_engine
 
 Base = declarative_base()
 
-class Restaurant(Base):
-	"""docstring for restaurant"""
-	__tablename__ = 'restaurant'
 
-	name = Column(
-		String(80), nullable = False)
+class User(Base):
+    """Table of Users"""
+    __tablename__ = 'user'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+    picture = Column(String(250))
 
-	id = Column(
-		Integer, primary_key = True)
+    @property
+    def serialize(self):
+        return {
+           'id': self.id,
+           'name': self.name,
+           'email': self.email,
+           'picture': self.picture
+        }
+
+
+class CoffeeShop(Base):
+    """Coffee Shops"""
+    __tablename__ = 'CoffeeShop'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+
+    @property
+    def serialize(self):
+        """Return object data in easily serialized format"""
+        return {
+            'name': self.name,
+            'id': self.id
+        }
 
 
 class MenuItem(Base):
-	"""docstring for MenuItems"""
-	__tablename__ = 'menu_item'
+    """Items served at the CoffeeShop"""
+    __tablename__ = 'MenuItem'
 
-	name = Column(String(80), nullable = False)
+    name = Column(String(80), nullable=False)
+    id = Column(Integer, primary_key=True)
+    description = Column(String(250))
+    price = Column(String(8))
+    coffeeshop_id = Column(Integer, ForeignKey('CoffeeShop.id'))
+    coffeeshop = relationship(CoffeeShop)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
-	id = Column(Integer, primary_key = True)
+    @property
+    def serialize(self):
+        """Returns object data in easily serialized format"""
+        return {
+           'name': self.name,
+           'id': self.id,
+           'description': self.description,
+           'price': self.price
 
-	course = Column(String(250))
-
-	description = Column(String(250))
-
-	price = Column(String(8))
-
-	restaurant_id = Column(
-		Integer, ForeignKey('restaurant.id'))
-
-	restaurant = relationship(Restaurant)
+        }
 
 ############# insert at end of file #############
 
