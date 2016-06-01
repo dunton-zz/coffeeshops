@@ -5,8 +5,13 @@ from catalog.database_setup import CoffeeShop, Base, MenuItem, User
 from catalog.database_connector import database_connector
 
 def populate_database():
-  
-    session = database_connector
+    '''Populate the database'''
+    
+    engine = create_engine(app.config['sqlite:///coffeeshopmenu.db'])
+    Base.metadata.bind = engine
+    db_session = sessionmaker(bind=engine)
+    session = db_session()
+
     # create four intial users
     User1 = User(name="Robo Barista", email="tinnyTim@udacity.com",
                  picture='https://bootcampbarista.com/wp-content/uploads/2014/06/barista-holding-coffee-cup-in-cafe-l.jpg')  # noqa
