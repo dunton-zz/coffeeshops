@@ -14,5 +14,5 @@ application.config['DATABASE_URL'] = 'sqlite:///coffeeshopmenu.db'
 application.config['OAUTH_SECRETS_LOCATION'] = '/coffeeshops/catalog/'
 
 # Create database and populate it, if not already done so.
-create_database(application.config['sqlite:///coffeeshopmenu.db'])
+create_database(application.config['DATABASE_URL'])
 populate_database()
