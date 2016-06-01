@@ -70,7 +70,7 @@ class MenuItem(Base):
 
 ############# insert at end of file #############
 
-def create_database():
+def create_database(database_url):
   engine = create_engine('sqlite:///coffeeshopmenu.db')
   Base.metadata.create_all(engine)
 
