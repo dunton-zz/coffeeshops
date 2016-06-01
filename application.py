@@ -12,8 +12,8 @@ if __name__ == '__main__':
 
     app.secret_key = 'super_secret_key'  # This needs changing in production env
 
-    if app.config['DATABASE_URL'] == 'sqlite:///itemcatalog.db':
-        if os.path.isfile('itemcatalog.db') is False:
+    if app.config['DATABASE_URL'] == 'sqlite:///coffeeshopmenu.db':
+        if os.path.isfile('sqlite:///coffeeshopmenu.db') is False:
             create_db(app.config['DATABASE_URL'])
             populate_database()
     else:  
