@@ -2,12 +2,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from catalog.database_setup import CoffeeShop, Base, MenuItem, User
-from catalog.database_connector import database_connector
+
 
 def populate_database():
     '''Populate the database'''
     
-    engine = create_engine(app.config['sqlite:///coffeeshopmenu.db'])
+    engine = create_engine('sqlite:////var/www/coffeeshops/catalog/coffeeshopmenu.db')
     Base.metadata.bind = engine
     db_session = sessionmaker(bind=engine)
     session = db_session()
