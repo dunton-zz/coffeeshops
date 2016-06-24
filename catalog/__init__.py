@@ -7,5 +7,5 @@ app = Flask(__name__)
 
 
 # Import modules 
-import catalog.fb_client_secrets
-import catalog.final_project
+import fb_client_secrets
+import final_project
