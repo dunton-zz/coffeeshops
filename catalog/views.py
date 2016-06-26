@@ -7,7 +7,7 @@
 from flask import Flask, render_template, request, redirect
 from flask import jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from database_setup import Base, User, CoffeeShop, MenuItem
 from flask import session as login_session
 import random
@@ -21,6 +21,7 @@ from flask import make_response
 import requests
 import sys
 import os
+from connect_database import connect_database
 
 app = Flask(__name__)
 
