@@ -25,6 +25,8 @@ from connect_database import connect_database
 
 app = Flask(__name__)
 
+app.secret_key = 'secret'
+
 #engine = create_engine('sqlite:///coffeeShopmenu.db')
 #Base.metadata.bind = engine
 
@@ -51,11 +53,13 @@ def fbconnect():
         return response
     access_token = request.data
     print "access token received %s " % access_token
-
-    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
+    
+    fb_client_secrets_file = 'var/www/coffeeshops/catalog/fb_client_secrets.json'
+    
+    app_id = json.loads(open(fb_client_secrets_file, 'r').read())[
         'web']['app_id']
     app_secret = json.loads(
-        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+        open(fb_client_secrets_file, 'r').read())['web']['app_secret']
     url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token) 
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
@@ -125,6 +129,7 @@ def createUser(login_session):
     '''Allows us to create new users'''
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
+    session = connect_database()
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
@@ -132,11 +137,13 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
+    session = connect_database()
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def getUserID(email):
+    session = connect_database()
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
@@ -171,6 +178,7 @@ def disconnect():
 @app.route('/coffeeshops/JSON')
 def coffeeshopsJSON():
     '''Allows API calls of all coffeeshops'''
+    session = connect_database()
     coffeeshops = session.query(CoffeeShop).order_by(CoffeeShop.id).all()
     return jsonify(CoffeeShops=[i.serialize for i in coffeeshops])
 
@@ -178,6 +186,7 @@ def coffeeshopsJSON():
 @app.route('/coffeeshops/<int:coffeeshop_id>/menu/JSON')
 def coffeeshopMenuJSON(coffeeshop_id):
     '''Allows API calls of coffeeshop menus'''
+    session = connect_database()
     coffeeshop = session.query(CoffeeShop).filter_by(id=coffeeshop_id).one()
     items = session.query(MenuItem).filter_by(coffeeshop_id=coffeeshop_id).all()
     return jsonify(MenuItems=[i.serialize for i in items])
@@ -186,6 +195,7 @@ def coffeeshopMenuJSON(coffeeshop_id):
 @app.route('/coffeeshops/<int:coffeeshop_id>/menu/<int:menu_id>/JSON')
 def menuItemJSON(coffeeshop_id, menu_id):
     '''Allows API calls of coffeeshop menu items'''
+    session = connect_database()
     menuItem = session.query(MenuItem).filter_by(id=menu_id).one()
     return jsonify(MenuItem=menuItem.serialize)
 
@@ -195,6 +205,7 @@ def menuItemJSON(coffeeshop_id, menu_id):
 @app.route('/coffeeshops/')
 def showCoffeeshops():
     '''Establish homepage, check if logged in or not'''
+    session = connect_database()
     coffeeshops = session.query(CoffeeShop).order_by(asc(CoffeeShop.name))
     if 'username' not in login_session:
         return render_template('publicCoffeeshops.html',
@@ -207,6 +218,7 @@ def showCoffeeshops():
 @app.route('/coffeeshops/<int:coffeeshop_id>/menu')
 def coffeeshopMenu(coffeeshop_id):
     '''Allows access to coffeeshops depending if user is logged in or not'''
+    session = connect_database()
     coffeeshop = session.query(CoffeeShop).filter_by(id=coffeeshop_id).one()
     creator = getUserInfo(coffeeshop.user_id)
     items = session.query(MenuItem).filter_by(coffeeshop_id=coffeeshop_id).all()
@@ -222,6 +234,7 @@ def newMenuItem(coffeeshop_id):
     '''Create new menu item if owner of the coffeshop'''
     if 'username' not in login_session:
         return redirect('/login')
+    session = connect_database()
     coffeeshop = session.query(CoffeeShop).filter_by(id=coffeeshop_id).one()
     if login_session['user_id'] != coffeeshop.user_id:
         flash('''You are not authorized to add menu items to this restaurant.
@@ -251,6 +264,7 @@ def newCoffeeshop():
         newCoffeeshop = CoffeeShop(name=request.form['name'],
                                    user_id=login_session['user_id'])
         # Adds coffeeshop to database
+        session = connect_database()
         session.add(newCoffeeshop)
         session.commit()
         flash("new coffee shop created!")
@@ -265,6 +279,7 @@ def editMenuItem(coffeeshop_id, menu_id):
     '''Allows user to edit menu items of their restaurant'''
     if 'username' not in login_session:
         return redirect('/login')
+    session = connect_database()
     editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
     coffeeshop = session.query(CoffeeShop).filter_by(id=coffeeshop_id).one()
     if login_session['user_id'] != coffeeshop.user_id:
@@ -280,6 +295,7 @@ def editMenuItem(coffeeshop_id, menu_id):
         if request.form['price']:
             editedItem.price = request.form['price']
         # Changes menu item in database
+        session = connect_database()
         session.add(editedItem)
         session.commit()
         flash("menu item edited!")
@@ -304,6 +320,7 @@ def editCoffeeShop(coffeeshop_id):
     if request.method == 'POST':
         if request.form['name']:
             editedShop.name = request.form['name']
+        session = connect_database()
         session.add(editedShop)
         session.commit()
         flash("Coffee shop edited!")
@@ -318,6 +335,7 @@ def deleteMenuItem(coffeeshop_id, menu_id):
     '''Allows user to delete items of their coffeeshop'''
     if 'username' not in login_session:
         return redirect('/login')
+    session = connect_database()
     coffeeshop = session.query(CoffeeShop).filter_by(id=coffeeshop_id).one()
     itemToDelete = session.query(MenuItem).filter_by(id=menu_id).one()
     if login_session['user_id'] != coffeeshop.user_id:
@@ -345,6 +363,7 @@ def deleteCoffeeShop(coffeeshop_id):
             Please create your own restaurant in order to delete.''')
         return redirect(url_for('showCoffeeshops'))
     if request.method == 'POST':
+        session = connect_database()
         session.delete(coffeeshopToDelete)
         session.commit()
         flash("coffee shop deleted!")
@@ -354,8 +373,8 @@ def deleteCoffeeShop(coffeeshop_id):
                                coffeeshop=coffeeshopToDelete)
 
 # Runs on port 8000
-if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
-    app.debug = True
-    app.run(host='0.0.0.0', port=8000)
+#if __name__ == '__main__':
+    #app.secret_key = 'super_secret_key'
+    #app.debug = True
+    #app.run(host='0.0.0.0', port=8000)
     
