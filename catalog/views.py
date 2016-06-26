@@ -270,7 +270,7 @@ def newCoffeeshop():
         flash("new coffee shop created!")
         return redirect(url_for('showCoffeeshops'))
     else:
-        return render_template('newCoffeeshop.html')
+        return render_template('newCoffeeShop.html')
 
 
 @app.route('/coffeeshops/<int:coffeeshop_id>/menu/<int:menu_id>/edit/',
