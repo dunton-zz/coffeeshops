@@ -1,37 +1,35 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from catalog.database_setup import CoffeeShop, Base, MenuItem, User
+from sqlalchemy.orm import sessionmaker, scoped_session
+from database_setup import CoffeeShop, Base, MenuItem, User
+from connect_database import connect_database
 
 
 def populate_database():
     '''Populate the database'''
-    
-    engine = create_engine('sqlite:////var/www/coffeeshops/catalog/coffeeshopmenu.db')
-    Base.metadata.bind = engine
-    db_session = sessionmaker(bind=engine)
-    session = db_session()
+
+    session = connect_database()
 
     # create four intial users
     User1 = User(name="Robo Barista", email="tinnyTim@udacity.com",
-                 picture='https://bootcampbarista.com/wp-content/uploads/2014/06/barista-holding-coffee-cup-in-cafe-l.jpg')  # noqa
+                 picture='https://bootcampbarista.com/wp-content/uploads/2014/06/barista-holding-coffee-cu$
     session.add(User1)
     session.commit()
 
     User2 = User(name="Emma Bell", email="emmabell@gmail.com",
-           picture='http://i2.cdn.turner.com/money/dam/assets/130529130233-starbucks-barista-1024x576.jpg')  # noqa
+           picture='http://i2.cdn.turner.com/money/dam/assets/130529130233-starbucks-barista-1024x576.jpg'$
     session.add(User2)
     session.commit()
 
     User3 = User(name="Brittney Wright", email="brittneywrighter@gmail.com",
-           picture='http://www.gannett-cdn.com/-mm-/af4fbd59496432518189c9ae390709aca94fe18f/c=547-506-2448-1934&r=x408&c=540x405/local/-/media/USATODAY/USATODAY/2014/08/14/1408057377000-XXX-Jason-King.jpg')  # noqa
+           picture='http://www.gannett-cdn.com/-mm-/af4fbd59496432518189c9ae390709aca94fe18f/c=547-506-244$
     session.add(User3)
     session.commit()
 
     User4 = User(name="Ryan Dunton", email="ryandunton1@gmail.com",
-           picture="https://v.cdn.vine.co/v/avatars/62E84159-EE83-4cD1-Bc4c-cAc47E469A69-465-0000002AcFFA4082.jpg?versionId=Km.V9pyK.KYJDyrAc0dRj9NLNTcTtXBL")  # noqa
+           picture="https://v.cdn.vine.co/v/avatars/62E84159-EE83-4cD1-Bc4c-cAc47E469A69-465-0000002AcFFA4$
     session.add(User4)
     session.commit()
+    
     # Menu for Blue Bottle coffee
     coffeeShop1 = CoffeeShop(user_id=1, name="Blue Bottle Coffee")
 
@@ -80,8 +78,7 @@ def populate_database():
 
     session.add(menuItem6)
     session.commit()
-
-
+    
     # Menu for Philz
     coffeeShop2 = CoffeeShop(user_id=2, name="Philz")
 
@@ -114,8 +111,8 @@ def populate_database():
                          description='''Another dark roast,
                                      popular with college students''',
                          price="$3.45", coffeeshop=coffeeShop2)
-  
-    session.add(menuItem4)  
+
+    session.add(menuItem4)
     session.commit()
 
     menuItem5 = MenuItem(user_id=2, name="canopy of Heaven",
@@ -132,8 +129,7 @@ def populate_database():
 
     session.add(menuItem6)
     session.commit()
-
-
+    
     # Menu for Starbucks
     coffeeShop3 = CoffeeShop(user_id=3, name="Starbucks")
 
@@ -162,7 +158,7 @@ def populate_database():
 
     session.add(menuItem3)
     session.commit()
-
+    
     menuItem4 = MenuItem(user_id=3, name="Pike's Place",
                          description='''Our signature roast and the favorite
                                      of customers all over the world''',
@@ -177,8 +173,7 @@ def populate_database():
 
     session.add(menuItem5)
     session.commit()
-
-
+    
     # Menu for Huckberry Roasters
     coffeeShop4 = CoffeeShop(user_id=4, name="Huckberry Roasters")
 
@@ -211,7 +206,7 @@ def populate_database():
     menuItem4 = MenuItem(user_id=4, name="Espresso Shot",
                          description="Our take on the traditional espresso shot!",
                          price="$2.95", coffeeshop=coffeeShop4)
-  
+
     session.add(menuItem4)
     session.commit()
 
@@ -223,8 +218,4 @@ def populate_database():
     session.add(menuItem5)
     session.commit()
 
-
     print "added menu items!"
-
-if __name__ == '__main__':
-    populate_database()
